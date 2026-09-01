@@ -1,0 +1,6 @@
+@SemgrepService_HostAddress = http://localhost:5278
+
+GET {{SemgrepService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

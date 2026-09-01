@@ -1,0 +1,19 @@
+# .NET
+bin/
+obj/
+
+# ASP.NET configuration / secrets
+appsettings.json
+appsettings.Development.json
+
+# Environment / secrets
+.env
+.env.*
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Logs
+*.log
