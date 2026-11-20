@@ -18,7 +18,7 @@ public class SemgrepScanService : ISemgrepService
                 Success = false,
                 Scanner = "Semgrep",
                 Source = request.Source,
-                Error = "Scan source belirtilmedi."
+                Error = "Scan source was not specified."
             };
         }
 
@@ -36,7 +36,7 @@ public class SemgrepScanService : ISemgrepService
                 Success = false,
                 Scanner = "Semgrep",
                 Source = request.Source,
-                Error = "Geçerli bir repository URL'si belirtilmelidir."
+                Error = "A valid repository URL must be provided."
             };
         }
 
@@ -93,7 +93,7 @@ public class SemgrepScanService : ISemgrepService
                     Scanner = "Semgrep",
                     Source = request.Source,
                     Error =
-                        $"Git repository clone edilemedi: {gitError}"
+                        $"Failed to clone Git repository: {gitError}"
                 };
             }
 
@@ -155,7 +155,7 @@ public class SemgrepScanService : ISemgrepService
                 Scanner = "Semgrep",
                 Source = request.Source,
                 Error =
-                    $"Semgrep çalıştırılırken hata oluştu: {ex.Message}"
+                    $"An error occurred while running Semgrep: {ex.Message}"
             };
         }
         finally
@@ -173,7 +173,7 @@ public class SemgrepScanService : ISemgrepService
                 catch (Exception ex)
                 {
                     Console.WriteLine(
-                        $"Geçici repository klasörü silinemedi: {ex.Message}");
+                        $"Failed to delete temporary repository {ex.Message}");
                 }
             }
         }
