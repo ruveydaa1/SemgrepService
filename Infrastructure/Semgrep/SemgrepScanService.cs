@@ -18,7 +18,7 @@ public class SemgrepScanService : ISemgrepService
                 Success = false,
                 Scanner = "Semgrep",
                 Source = request.Source,
-                Error = "Scan source belirtilmedi."
+                Error = "Scan source was not specified."
             };
         }
 
@@ -36,7 +36,7 @@ public class SemgrepScanService : ISemgrepService
                 Success = false,
                 Scanner = "Semgrep",
                 Source = request.Source,
-                Error = "Geçerli bir repository URL'si belirtilmelidir."
+                Error = "A valid repository URL must be provided."
             };
         }
 
@@ -93,7 +93,7 @@ public class SemgrepScanService : ISemgrepService
                     Scanner = "Semgrep",
                     Source = request.Source,
                     Error =
-                        $"Git repository clone edilemedi: {gitError}"
+                        $"Failed to clone Git repository: {gitError}"
                 };
             }
 
@@ -155,7 +155,7 @@ public class SemgrepScanService : ISemgrepService
                 Scanner = "Semgrep",
                 Source = request.Source,
                 Error =
-                    $"Semgrep çalıştırılırken hata oluştu: {ex.Message}"
+                    $"An error occurred while running Semgrep: {ex.Message}"
             };
         }
         finally
@@ -173,11 +173,12 @@ public class SemgrepScanService : ISemgrepService
                 catch (Exception ex)
                 {
                     Console.WriteLine(
-                        $"Geçici repository klasörü silinemedi: {ex.Message}");
+                        $"Failed to delete temporary repository {ex.Message}");
                 }
             }
         }
     }
+
 
     private List<ScanFinding> ParseFindings(string output)
     {
@@ -202,25 +203,39 @@ public class SemgrepScanService : ISemgrepService
 
             foreach (var result in results.EnumerateArray())
             {
+                var checkId = GetString(
+                    result,
+                    "check_id");
+
+                var message = GetNestedString(
+                    result,
+                    "extra",
+                    "message");
+
                 var finding = new ScanFinding
                 {
-                    CheckId = GetString(
-                        result,
-                        "check_id"),
+                    CheckId = checkId,
+
+                    Identifier = checkId,
+
+                    IdentifierType = "SemgrepRule",
+
+                    Title = message,
 
                     Path = GetString(
                         result,
                         "path"),
 
-                    Message = GetNestedString(
-                        result,
-                        "extra",
-                        "message"),
+                    Message = message,
+
+                    Category = "SAST",
 
                     Severity = GetNestedString(
                         result,
                         "extra",
                         "severity"),
+
+                    Status = "Open",
 
                     Confidence = GetNestedString(
                         result,
@@ -233,12 +248,6 @@ public class SemgrepScanService : ISemgrepService
                         "extra",
                         "metadata",
                         "impact"),
-
-                    Category = GetNestedString(
-                        result,
-                        "extra",
-                        "metadata",
-                        "category"),
 
                     Cwe = GetMetadataValue(
                         result,
@@ -290,6 +299,7 @@ public class SemgrepScanService : ISemgrepService
 
         return findings;
     }
+
 
     private static string GetString(
         JsonElement element,
